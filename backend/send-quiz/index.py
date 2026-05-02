@@ -33,16 +33,22 @@ def handler(event: dict, context) -> dict:
 
     now = datetime.now().strftime('%d.%m.%Y %H:%M')
 
-    total = len(questions)
-    correct_count = sum(1 for q_id, ans in answers.items() if ans == correct.get(q_id, ''))
+    total = body.get('total', len(questions))
+    correct_count = body.get('score', sum(1 for q_id, ans in answers.items() if ans == correct.get(q_id, '')))
+    passed = body.get('passed', False)
+    grade = body.get('grade', 'Не указано')
+    exam_result = "✅ СДАН" if passed else "❌ НЕ СДАН"
 
     lines = [
-        "📋 *Результаты опроса РКПЦ*",
+        "🏥 *Экзамен по охране труда — РКПЦ*",
         f"🕐 {now}",
         f"👤 *ФИО:* {full_name}",
         f"💼 *Должность:* {position}",
-        f"🏥 *Подразделение:* {department}",
-        f"📊 *Результат:* {correct_count} из {total} правильных",
+        f"🏢 *Подразделение:* {department}",
+        "",
+        f"📊 *Результат:* {correct_count} из {total} баллов",
+        f"🎓 *Экзамен:* {exam_result}",
+        f"📝 *Оценка:* {grade}",
         "",
     ]
     for q_id, answer in answers.items():
