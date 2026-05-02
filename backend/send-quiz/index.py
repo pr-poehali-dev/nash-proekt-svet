@@ -23,13 +23,19 @@ def handler(event: dict, context) -> dict:
     body = json.loads(event.get('body', '{}'))
     answers = body.get('answers', {})
     questions = body.get('questions', {})
+    full_name = body.get('fullName', 'Не указано')
 
     bot_token = os.environ['TELEGRAM_BOT_TOKEN']
     chat_id = os.environ['TELEGRAM_CHAT_ID']
 
     now = datetime.now().strftime('%d.%m.%Y %H:%M')
 
-    lines = [f"📋 *Новый ответ на опрос РКПЦ*", f"🕐 {now}", ""]
+    lines = [
+        "📋 *Новый ответ на опрос РКПЦ*",
+        f"🕐 {now}",
+        f"👤 *ФИО:* {full_name}",
+        "",
+    ]
     for q_id, answer in answers.items():
         question_text = questions.get(q_id, f"Вопрос {q_id}")
         lines.append(f"*{question_text}*")
