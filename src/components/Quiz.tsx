@@ -260,19 +260,19 @@ export default function Quiz() {
             <div className="bg-blue-900 px-8 py-5 flex items-center justify-between">
               <div className="flex items-center gap-4">
                 <img
-                  src="https://cdn.poehali.dev/projects/9bf1b59e-6851-4d79-b1df-a33711e827a2/files/1bed2723-a77e-49dc-bbfd-8597cef911b6.jpg"
-                  alt="Эмблема РКПЦ"
+                  src="https://cdn.poehali.dev/projects/9bf1b59e-6851-4d79-b1df-a33711e827a2/bucket/6ac22e0b-672f-45d9-b92d-308e8afcc059.jpeg"
+                  alt="Логотип РКПЦ"
                   className="w-14 h-14 rounded-full object-cover border-2 border-white/40"
                 />
                 <div>
                   <p className="text-blue-200 text-xs uppercase tracking-widest">Республика Башкортостан</p>
-                  <p className="text-white font-bold">ГБУЗ РБ РКПЦ</p>
+                  <p className="text-white font-bold">ГБУЗ РКПЦ МЗ РБ</p>
                 </div>
               </div>
               <img
-                src="https://cdn.poehali.dev/projects/9bf1b59e-6851-4d79-b1df-a33711e827a2/files/21aa1b56-27d2-4373-a886-1415f5258722.jpg"
-                alt="РКПЦ"
-                className="w-16 h-16 object-cover rounded opacity-70"
+                src="https://cdn.poehali.dev/projects/9bf1b59e-6851-4d79-b1df-a33711e827a2/bucket/6eb48b43-3528-4d4a-910c-5ce1c9dbd46d.jpeg"
+                alt="Здание РКПЦ"
+                className="w-20 h-16 object-cover rounded"
               />
             </div>
 
@@ -443,7 +443,7 @@ export default function Quiz() {
                     <button
                       key={option}
                       onClick={() => handleAnswer(option)}
-                      className="text-left text-gray-800 border-2 border-gray-200 bg-white px-5 py-4 text-sm hover:border-blue-600 hover:bg-blue-50 hover:text-blue-900 transition-all duration-150 cursor-pointer leading-snug font-medium"
+                      className="text-left text-gray-800 border-2 border-gray-200 bg-white px-5 py-4 text-sm hover:border-gray-400 hover:bg-gray-50 transition-all duration-150 cursor-pointer leading-snug font-medium focus:outline-none"
                     >
                       {option}
                     </button>
