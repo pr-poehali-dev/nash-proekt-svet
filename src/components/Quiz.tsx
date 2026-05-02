@@ -126,15 +126,15 @@ const BACKEND_URL = "https://functions.poehali.dev/4aaaaa54-1479-49d1-a15f-34da4
 
 export default function Quiz() {
   const [step, setStep] = useState<"fio" | "quiz" | "sending" | "done">("fio");
-  const [fio, setFio] = useState({ lastName: "", firstName: "", middleName: "" });
+  const [fio, setFio] = useState({ lastName: "", firstName: "", middleName: "", position: "", department: "" });
   const [fioError, setFioError] = useState("");
   const [current, setCurrent] = useState(0);
   const [answers, setAnswers] = useState<Record<number, string>>({});
 
   const handleFioSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!fio.lastName.trim() || !fio.firstName.trim()) {
-      setFioError("Пожалуйста, заполните фамилию и имя");
+    if (!fio.lastName.trim() || !fio.firstName.trim() || !fio.position.trim() || !fio.department.trim()) {
+      setFioError("Пожалуйста, заполните все обязательные поля");
       return;
     }
     setFioError("");
@@ -152,7 +152,7 @@ export default function Quiz() {
       await fetch(BACKEND_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ answers: finalAnswers, questions: questionsMap, fullName }),
+        body: JSON.stringify({ answers: finalAnswers, questions: questionsMap, fullName, position: fio.position, department: fio.department }),
       });
     } catch (e) {
       console.error("Ошибка отправки в Telegram", e);
@@ -174,7 +174,7 @@ export default function Quiz() {
   const restart = () => {
     setCurrent(0);
     setAnswers({});
-    setFio({ lastName: "", firstName: "", middleName: "" });
+    setFio({ lastName: "", firstName: "", middleName: "", position: "", department: "" });
     setStep("fio");
   };
 
@@ -212,6 +212,20 @@ export default function Quiz() {
                 placeholder="Отчество"
                 value={fio.middleName}
                 onChange={(e) => setFio({ ...fio, middleName: e.target.value })}
+                className="bg-transparent border border-neutral-700 text-white px-6 py-4 text-base placeholder-neutral-500 focus:outline-none focus:border-white transition-colors duration-200"
+              />
+              <input
+                type="text"
+                placeholder="Должность *"
+                value={fio.position}
+                onChange={(e) => setFio({ ...fio, position: e.target.value })}
+                className="bg-transparent border border-neutral-700 text-white px-6 py-4 text-base placeholder-neutral-500 focus:outline-none focus:border-white transition-colors duration-200"
+              />
+              <input
+                type="text"
+                placeholder="Подразделение *"
+                value={fio.department}
+                onChange={(e) => setFio({ ...fio, department: e.target.value })}
                 className="bg-transparent border border-neutral-700 text-white px-6 py-4 text-base placeholder-neutral-500 focus:outline-none focus:border-white transition-colors duration-200"
               />
               {fioError && <p className="text-red-400 text-sm">{fioError}</p>}

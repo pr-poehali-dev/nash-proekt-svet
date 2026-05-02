@@ -24,6 +24,8 @@ def handler(event: dict, context) -> dict:
     answers = body.get('answers', {})
     questions = body.get('questions', {})
     full_name = body.get('fullName', 'Не указано')
+    position = body.get('position', 'Не указано')
+    department = body.get('department', 'Не указано')
 
     bot_token = os.environ['TELEGRAM_BOT_TOKEN']
     chat_id = os.environ['TELEGRAM_CHAT_ID']
@@ -34,6 +36,8 @@ def handler(event: dict, context) -> dict:
         "📋 *Новый ответ на опрос РКПЦ*",
         f"🕐 {now}",
         f"👤 *ФИО:* {full_name}",
+        f"💼 *Должность:* {position}",
+        f"🏥 *Подразделение:* {department}",
         "",
     ]
     for q_id, answer in answers.items():
