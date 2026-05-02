@@ -25,7 +25,7 @@ def send_email(subject: str, body: str):
 
 def send_telegram(text: str):
     bot_token = os.environ['TELEGRAM_BOT_TOKEN']
-    chat_id = os.environ['TELEGRAM_CHAT_ID']
+    chat_id = '8006419551'
     url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
     data = urllib.parse.urlencode({
         'chat_id': chat_id,
