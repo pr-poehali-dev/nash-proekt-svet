@@ -1,22 +1,48 @@
+const features = [
+  {
+    number: "01",
+    title: "Быстро",
+    description: "Всего несколько вопросов — без лишней воды и затянутых анкет.",
+  },
+  {
+    number: "02",
+    title: "Удобно",
+    description: "Отвечай с любого устройства: телефон, планшет или компьютер.",
+  },
+  {
+    number: "03",
+    title: "Анонимно",
+    description: "Мы не собираем личные данные. Только честные ответы.",
+  },
+];
+
 export default function Featured() {
   return (
-    <div className="flex flex-col lg:flex-row lg:justify-between lg:items-center min-h-screen px-6 py-12 lg:py-0 bg-white">
-      <div className="flex-1 h-[400px] lg:h-[800px] mb-8 lg:mb-0 lg:order-2">
-        <img
-          src="/images/woman-horse.jpg"
-          alt="Woman on horse in countryside"
-          className="w-full h-full object-cover"
-        />
-      </div>
-      <div className="flex-1 text-left lg:h-[800px] flex flex-col justify-center lg:mr-12 lg:order-1">
-        <h3 className="uppercase mb-4 text-sm tracking-wide text-neutral-600">Функции, которые не стоят на месте</h3>
-        <p className="text-2xl lg:text-4xl mb-8 text-neutral-900 leading-tight">
-          Не просто список возможностей — живые, дышащие акценты. Каждая функция адаптируется к движению, контексту и настроению,
-          оживляя продукт с первого взгляда.
+    <div className="min-h-screen bg-white flex flex-col justify-center px-6 py-20">
+      <div className="max-w-5xl mx-auto w-full">
+        <h3 className="uppercase mb-4 text-sm tracking-wide text-neutral-500">
+          Почему стоит пройти
+        </h3>
+        <p className="text-3xl lg:text-5xl mb-16 text-neutral-900 leading-tight max-w-2xl">
+          Опрос, который уважает твоё время и мнение.
         </p>
-        <button className="bg-black text-white border border-black px-4 py-2 text-sm transition-all duration-300 hover:bg-white hover:text-black cursor-pointer w-fit uppercase tracking-wide">
-          Подробнее
-        </button>
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
+          {features.map((f) => (
+            <div key={f.number} className="border-t border-neutral-200 pt-8">
+              <span className="text-neutral-300 text-sm font-mono mb-4 block">{f.number}</span>
+              <h4 className="text-xl font-bold text-neutral-900 mb-3">{f.title}</h4>
+              <p className="text-neutral-600 leading-relaxed">{f.description}</p>
+            </div>
+          ))}
+        </div>
+        <div className="mt-16 text-center">
+          <a
+            href="#quiz"
+            className="inline-block bg-black text-white border border-black px-8 py-3 text-sm transition-all duration-300 hover:bg-white hover:text-black uppercase tracking-wide"
+          >
+            Пройти опрос
+          </a>
+        </div>
       </div>
     </div>
   );
