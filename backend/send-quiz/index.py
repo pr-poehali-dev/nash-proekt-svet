@@ -1,6 +1,8 @@
 import json
 import os
 import smtplib
+import urllib.request
+import urllib.parse
 from email.mime.text import MIMEText
 from email.mime.multipart import MIMEMultipart
 
@@ -21,8 +23,22 @@ def send_email(subject: str, body: str):
         server.sendmail(smtp_user, to_email, msg.as_string())
 
 
+def send_telegram(text: str):
+    bot_token = os.environ['TELEGRAM_BOT_TOKEN']
+    chat_id = os.environ['TELEGRAM_CHAT_ID']
+    url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
+    data = urllib.parse.urlencode({
+        'chat_id': chat_id,
+        'text': text,
+        'parse_mode': 'Markdown'
+    }).encode()
+    req = urllib.request.Request(url, data=data, method='POST')
+    with urllib.request.urlopen(req) as resp:
+        return json.loads(resp.read())
+
+
 def handler(event: dict, context) -> dict:
-    """Принимает ответы экзамена РКПЦ и отправляет результат на email."""
+    """Принимает ответы экзамена РКПЦ и отправляет результат на email и в Telegram."""
 
     if event.get('httpMethod') == 'OPTIONS':
         return {
@@ -43,17 +59,21 @@ def handler(event: dict, context) -> dict:
     passed = body.get('passed', False)
     exam_result = "СДАН" if passed else "НЕ СДАН"
 
-    subject = f"Экзамен по охране труда — {full_name} — {exam_result}"
-
-    text_lines = [
-        f"ФИО: {full_name}",
-        f"Должность: {position}",
-        f"Подразделение: {department}",
+    lines = [
+        f"👤 *{full_name}*",
+        f"💼 {position}",
+        f"🏢 {department}",
         "",
-        f"Результат: {exam_result}",
+        f"{'✅' if passed else '❌'} *{exam_result}*",
     ]
+    text = "\n".join(lines)
 
-    send_email(subject, "\n".join(text_lines))
+    send_telegram(text)
+
+    send_email(
+        subject=f"Экзамен по охране труда — {full_name} — {exam_result}",
+        body=f"ФИО: {full_name}\nДолжность: {position}\nПодразделение: {department}\n\nРезультат: {exam_result}"
+    )
 
     return {
         'statusCode': 200,
