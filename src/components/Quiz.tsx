@@ -4,30 +4,53 @@ import { motion, AnimatePresence } from "framer-motion";
 const questions = [
   {
     id: 1,
-    question: "Как вы узнали о нас?",
-    options: ["Из социальных сетей", "От друзей или знакомых", "Через поиск в интернете", "Из рекламы"],
+    question: "Как вы оцениваете качество медицинской помощи в РКПЦ?",
+    options: ["Отлично", "Хорошо", "Удовлетворительно", "Неудовлетворительно"],
   },
   {
     id: 2,
-    question: "Как часто вы пользуетесь подобными сервисами?",
-    options: ["Каждый день", "Несколько раз в неделю", "Раз в месяц", "Впервые пробую"],
+    question: "Как вы оцениваете отношение персонала?",
+    options: ["Очень внимательное", "Внимательное", "Нейтральное", "Невнимательное"],
   },
   {
     id: 3,
-    question: "Что для вас важнее всего?",
-    options: ["Простота и удобство", "Скорость работы", "Надёжность и безопасность", "Цена"],
+    question: "Насколько вы довольны условиями пребывания в центре?",
+    options: ["Полностью доволен(а)", "В целом доволен(а)", "Есть замечания", "Не доволен(а)"],
   },
   {
     id: 4,
-    question: "Оцените ваш опыт использования (1 — плохо, 5 — отлично)",
-    options: ["1 — Плохо", "2 — Ниже среднего", "3 — Нормально", "4 — Хорошо", "5 — Отлично"],
+    question: "Порекомендуете ли вы РКПЦ своим близким?",
+    options: ["Обязательно порекомендую", "Скорее да", "Скорее нет", "Нет"],
   },
 ];
+
+const BACKEND_URL = "https://functions.poehali.dev/4aaaaa54-1479-49d1-a15f-34da45f4eba8";
 
 export default function Quiz() {
   const [current, setCurrent] = useState(0);
   const [answers, setAnswers] = useState<Record<number, string>>({});
   const [done, setDone] = useState(false);
+  const [sending, setSending] = useState(false);
+
+  const sendToTelegram = async (finalAnswers: Record<number, string>) => {
+    setSending(true);
+    const questionsMap: Record<string, string> = {};
+    questions.forEach((q) => {
+      questionsMap[q.id] = q.question;
+    });
+    try {
+      await fetch(BACKEND_URL, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ answers: finalAnswers, questions: questionsMap }),
+      });
+    } catch (e) {
+      console.error('Ошибка отправки в Telegram', e);
+    } finally {
+      setSending(false);
+      setDone(true);
+    }
+  };
 
   const handleAnswer = (option: string) => {
     const updated = { ...answers, [questions[current].id]: option };
@@ -35,7 +58,7 @@ export default function Quiz() {
     if (current + 1 < questions.length) {
       setCurrent(current + 1);
     } else {
-      setDone(true);
+      sendToTelegram(updated);
     }
   };
 
@@ -48,7 +71,7 @@ export default function Quiz() {
   return (
     <div id="quiz" className="min-h-screen bg-neutral-950 flex items-center justify-center px-6 py-20">
       <div className="w-full max-w-2xl">
-        {!done ? (
+        {!done && !sending ? (
           <>
             <div className="flex gap-2 mb-12">
               {questions.map((_, i) => (
@@ -89,6 +112,8 @@ export default function Quiz() {
               </motion.div>
             </AnimatePresence>
           </>
+        ) : sending ? (
+          <div className="text-center text-white text-xl opacity-60">Отправляем ваши ответы...</div>
         ) : (
           <motion.div
             initial={{ opacity: 0, scale: 0.95 }}
@@ -99,7 +124,7 @@ export default function Quiz() {
             <p className="text-neutral-500 uppercase text-xs tracking-widest mb-6">Готово!</p>
             <h2 className="text-white text-4xl md:text-6xl font-bold mb-6">Спасибо!</h2>
             <p className="text-neutral-400 text-lg mb-10">
-              Ваши ответы записаны. Мы ценим ваше мнение.
+              Ваши ответы переданы в РКПЦ. Мы обязательно учтём ваше мнение.
             </p>
             <button
               onClick={restart}

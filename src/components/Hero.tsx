@@ -19,19 +19,19 @@ export default function Hero() {
         className="absolute inset-0 w-full h-full"
       >
         <img
-          src="https://cdn.poehali.dev/projects/9bf1b59e-6851-4d79-b1df-a33711e827a2/files/efc5a98a-b20c-46cd-8580-007f25bd7bf0.jpg"
+          src="https://cdn.poehali.dev/projects/9bf1b59e-6851-4d79-b1df-a33711e827a2/files/21aa1b56-27d2-4373-a886-1415f5258722.jpg"
           alt="Hero background"
           className="w-full h-full object-cover"
         />
       </motion.div>
 
       <div className="relative z-10 text-center text-white px-6">
-        <p className="uppercase tracking-widest text-sm opacity-70 mb-4">Узнай себя лучше</p>
-        <h1 className="text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight mb-6">
-          ОПРОС
+        <p className="uppercase tracking-widest text-sm opacity-70 mb-4">Республиканский клинический перинатальный центр</p>
+        <h1 className="text-4xl md:text-6xl lg:text-7xl font-bold tracking-tight mb-6">
+          РКПЦ
         </h1>
         <p className="text-lg md:text-xl max-w-2xl mx-auto opacity-90 mb-10">
-          Ответь на несколько вопросов — это займёт всего пару минут
+          Опрос пациентов и сотрудников — помогите нам стать лучше, ответив на несколько вопросов
         </p>
         <a
           href="#quiz"

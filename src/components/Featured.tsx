@@ -1,18 +1,18 @@
 const features = [
   {
     number: "01",
-    title: "Быстро",
-    description: "Всего несколько вопросов — без лишней воды и затянутых анкет.",
+    title: "Конфиденциально",
+    description: "Ваши ответы используются только для улучшения качества медицинской помощи.",
   },
   {
     number: "02",
-    title: "Удобно",
-    description: "Отвечай с любого устройства: телефон, планшет или компьютер.",
+    title: "Быстро",
+    description: "Всего несколько вопросов — не более 3 минут вашего времени.",
   },
   {
     number: "03",
-    title: "Анонимно",
-    description: "Мы не собираем личные данные. Только честные ответы.",
+    title: "Важно",
+    description: "Каждый отзыв помогает нам заботиться о пациентах ещё лучше.",
   },
 ];
 
@@ -21,10 +21,10 @@ export default function Featured() {
     <div className="min-h-screen bg-white flex flex-col justify-center px-6 py-20">
       <div className="max-w-5xl mx-auto w-full">
         <h3 className="uppercase mb-4 text-sm tracking-wide text-neutral-500">
-          Почему стоит пройти
+          РКПЦ — Ваше мнение важно
         </h3>
         <p className="text-3xl lg:text-5xl mb-16 text-neutral-900 leading-tight max-w-2xl">
-          Опрос, который уважает твоё время и мнение.
+          Помогите нам улучшить качество медицинской помощи.
         </p>
         <div className="grid grid-cols-1 md:grid-cols-3 gap-12">
           {features.map((f) => (
