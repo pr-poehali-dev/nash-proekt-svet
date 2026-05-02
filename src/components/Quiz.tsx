@@ -11,6 +11,7 @@ const questions = [
       "В) Исключительно коллективным договором",
       "Г) Локальными актами без учёта федеральных норм",
     ],
+    correct: "Б) Правилами по охране труда, утверждёнными Минтрудом России, и иными нормативными правовыми актами",
   },
   {
     id: 2,
@@ -21,6 +22,7 @@ const questions = [
       "В) Все медицинские работники, а также иные работники медицинских организаций в случаях, предусмотренных законодательством",
       "Г) Исключительно работники пищеблока больницы",
     ],
+    correct: "В) Все медицинские работники, а также иные работники медицинских организаций в случаях, предусмотренных законодательством",
   },
   {
     id: 3,
@@ -31,6 +33,7 @@ const questions = [
       "В) 39 часов",
       "Г) 42 часа",
     ],
+    correct: "В) 39 часов",
   },
   {
     id: 4,
@@ -41,6 +44,7 @@ const questions = [
       "В) Внеплановый",
       "Г) Целевой",
     ],
+    correct: "Б) Первичный инструктаж на рабочем месте",
   },
   {
     id: 5,
@@ -51,6 +55,7 @@ const questions = [
       "В) Микроорганизмы-продуценты и возбудители инфекционных заболеваний",
       "Г) Ионизирующее излучение",
     ],
+    correct: "В) Микроорганизмы-продуценты и возбудители инфекционных заболеваний",
   },
   {
     id: 6,
@@ -61,6 +66,7 @@ const questions = [
       "В) Только заведующий отделением",
       "Г) Только представитель профсоюза",
     ],
+    correct: "Б) Каждый работник медицинской организации",
   },
   {
     id: 7,
@@ -71,6 +77,7 @@ const questions = [
       "В) Не реже 1 раза в 3 месяца",
       "Г) Повторный инструктаж отменён, проводится только внеплановый",
     ],
+    correct: "Б) Не реже 1 раза в 6 месяцев",
   },
   {
     id: 8,
@@ -81,6 +88,7 @@ const questions = [
       "В) Любые перчатки по своему усмотрению",
       "Г) Только медицинскую шапочку и халат",
     ],
+    correct: "Б) Средства индивидуальной и коллективной защиты в соответствии с типовыми нормами и характером работы",
   },
   {
     id: 9,
@@ -91,6 +99,7 @@ const questions = [
       "В) Комиссия, созданная работодателем, с участием представителей профсоюза и специалиста по охране труда",
       "Г) Сам пострадавший",
     ],
+    correct: "В) Комиссия, созданная работодателем, с участием представителей профсоюза и специалиста по охране труда",
   },
   {
     id: 10,
@@ -101,6 +110,7 @@ const questions = [
       "В) Да, по устному распоряжению заведующего отделением",
       "Г) Да, в любых случаях при производственной необходимости",
     ],
+    correct: "А) Да, в случаях, предусмотренных трудовым законодательством (например, для предотвращения катастрофы или устранения последствий аварии)",
   },
   {
     id: 11,
@@ -111,6 +121,7 @@ const questions = [
       "В) Медицинские (смотровые или хирургические) одноразовые перчатки, соответствующие требованиям защиты от биологических факторов",
       "Г) Строительные перчатки с полимерным покрытием",
     ],
+    correct: "В) Медицинские (смотровые или хирургические) одноразовые перчатки, соответствующие требованиям защиты от биологических факторов",
   },
   {
     id: 12,
@@ -119,6 +130,7 @@ const questions = [
       "А) Немедленно снять повреждённые перчатки, вымыть руки, обработать антисептиком и надеть новую пару перчаток",
       "Б) Продолжить манипуляцию в повреждённых перчатках до её завершения",
     ],
+    correct: "А) Немедленно снять повреждённые перчатки, вымыть руки, обработать антисептиком и надеть новую пару перчаток",
   },
 ];
 
@@ -144,15 +156,24 @@ export default function Quiz() {
   const sendToTelegram = async (finalAnswers: Record<number, string>) => {
     setStep("sending");
     const questionsMap: Record<string, string> = {};
+    const correctMap: Record<string, string> = {};
     questions.forEach((q) => {
-      questionsMap[q.id] = q.question;
+      questionsMap[String(q.id)] = q.question;
+      correctMap[String(q.id)] = q.correct;
     });
     const fullName = [fio.lastName, fio.firstName, fio.middleName].filter(Boolean).join(" ");
     try {
       await fetch(BACKEND_URL, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ answers: finalAnswers, questions: questionsMap, fullName, position: fio.position, department: fio.department }),
+        body: JSON.stringify({
+          answers: finalAnswers,
+          questions: questionsMap,
+          correct: correctMap,
+          fullName,
+          position: fio.position,
+          department: fio.department,
+        }),
       });
     } catch (e) {
       console.error("Ошибка отправки в Telegram", e);
@@ -178,53 +199,41 @@ export default function Quiz() {
     setStep("fio");
   };
 
+  const score = questions.filter((q) => answers[q.id] === q.correct).length;
+
   return (
     <div id="quiz" className="min-h-screen bg-neutral-950 flex items-center justify-center px-6 py-20">
       <div className="w-full max-w-2xl">
 
         {step === "fio" && (
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-          >
+          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}>
             <p className="text-neutral-500 uppercase text-xs tracking-widest mb-4">Начало опроса</p>
             <h2 className="text-white text-2xl md:text-4xl font-bold mb-10 leading-tight">
               Представьтесь, пожалуйста
             </h2>
             <form onSubmit={handleFioSubmit} className="flex flex-col gap-4">
               <input
-                type="text"
-                placeholder="Фамилия *"
-                value={fio.lastName}
+                type="text" placeholder="Фамилия *" value={fio.lastName}
                 onChange={(e) => setFio({ ...fio, lastName: e.target.value })}
                 className="bg-transparent border border-neutral-700 text-white px-6 py-4 text-base placeholder-neutral-500 focus:outline-none focus:border-white transition-colors duration-200"
               />
               <input
-                type="text"
-                placeholder="Имя *"
-                value={fio.firstName}
+                type="text" placeholder="Имя *" value={fio.firstName}
                 onChange={(e) => setFio({ ...fio, firstName: e.target.value })}
                 className="bg-transparent border border-neutral-700 text-white px-6 py-4 text-base placeholder-neutral-500 focus:outline-none focus:border-white transition-colors duration-200"
               />
               <input
-                type="text"
-                placeholder="Отчество"
-                value={fio.middleName}
+                type="text" placeholder="Отчество" value={fio.middleName}
                 onChange={(e) => setFio({ ...fio, middleName: e.target.value })}
                 className="bg-transparent border border-neutral-700 text-white px-6 py-4 text-base placeholder-neutral-500 focus:outline-none focus:border-white transition-colors duration-200"
               />
               <input
-                type="text"
-                placeholder="Должность *"
-                value={fio.position}
+                type="text" placeholder="Должность *" value={fio.position}
                 onChange={(e) => setFio({ ...fio, position: e.target.value })}
                 className="bg-transparent border border-neutral-700 text-white px-6 py-4 text-base placeholder-neutral-500 focus:outline-none focus:border-white transition-colors duration-200"
               />
               <input
-                type="text"
-                placeholder="Подразделение *"
-                value={fio.department}
+                type="text" placeholder="Подразделение *" value={fio.department}
                 onChange={(e) => setFio({ ...fio, department: e.target.value })}
                 className="bg-transparent border border-neutral-700 text-white px-6 py-4 text-base placeholder-neutral-500 focus:outline-none focus:border-white transition-colors duration-200"
               />
@@ -245,20 +254,15 @@ export default function Quiz() {
               {questions.map((_, i) => (
                 <div
                   key={i}
-                  className={`h-1 flex-1 min-w-[8px] transition-all duration-500 ${
-                    i <= current ? "bg-white" : "bg-neutral-700"
-                  }`}
+                  className={`h-1 flex-1 min-w-[8px] transition-all duration-500 ${i <= current ? "bg-white" : "bg-neutral-700"}`}
                 />
               ))}
             </div>
-
             <AnimatePresence mode="wait">
               <motion.div
                 key={current}
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -20 }}
-                transition={{ duration: 0.4 }}
+                initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
+                exit={{ opacity: 0, y: -20 }} transition={{ duration: 0.4 }}
               >
                 <p className="text-neutral-500 uppercase text-xs tracking-widest mb-4">
                   Вопрос {current + 1} из {questions.length}
@@ -288,16 +292,40 @@ export default function Quiz() {
 
         {step === "done" && (
           <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
+            initial={{ opacity: 0, scale: 0.95 }} animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.5 }}
-            className="text-center"
           >
-            <p className="text-neutral-500 uppercase text-xs tracking-widest mb-6">Готово!</p>
-            <h2 className="text-white text-4xl md:text-6xl font-bold mb-6">Спасибо!</h2>
+            <p className="text-neutral-500 uppercase text-xs tracking-widest mb-4">Результаты</p>
+            <h2 className="text-white text-4xl md:text-5xl font-bold mb-2">
+              {score} / {questions.length}
+            </h2>
             <p className="text-neutral-400 text-lg mb-10">
-              Ваши ответы переданы в РКПЦ. Мы обязательно учтём ваше мнение.
+              правильных ответов
             </p>
+
+            <div className="flex flex-col gap-4 mb-12">
+              {questions.map((q) => {
+                const userAnswer = answers[q.id];
+                const isCorrect = userAnswer === q.correct;
+                return (
+                  <div
+                    key={q.id}
+                    className={`border px-6 py-5 ${isCorrect ? "border-green-600 bg-green-950/30" : "border-red-700 bg-red-950/30"}`}
+                  >
+                    <p className="text-neutral-300 text-sm mb-3 leading-snug">{q.question}</p>
+                    <p className={`text-sm font-medium ${isCorrect ? "text-green-400" : "text-red-400"}`}>
+                      {isCorrect ? "✓" : "✗"} Ваш ответ: {userAnswer}
+                    </p>
+                    {!isCorrect && (
+                      <p className="text-green-400 text-sm mt-1">
+                        ✓ Правильно: {q.correct}
+                      </p>
+                    )}
+                  </div>
+                );
+              })}
+            </div>
+
             <button
               onClick={restart}
               className="bg-white text-black px-8 py-3 uppercase text-sm tracking-wide hover:bg-neutral-200 transition-all duration-200 cursor-pointer"

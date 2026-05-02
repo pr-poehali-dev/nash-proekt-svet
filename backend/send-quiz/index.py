@@ -23,6 +23,7 @@ def handler(event: dict, context) -> dict:
     body = json.loads(event.get('body', '{}'))
     answers = body.get('answers', {})
     questions = body.get('questions', {})
+    correct = body.get('correct', {})
     full_name = body.get('fullName', 'Не указано')
     position = body.get('position', 'Не указано')
     department = body.get('department', 'Не указано')
@@ -32,18 +33,27 @@ def handler(event: dict, context) -> dict:
 
     now = datetime.now().strftime('%d.%m.%Y %H:%M')
 
+    total = len(questions)
+    correct_count = sum(1 for q_id, ans in answers.items() if ans == correct.get(q_id, ''))
+
     lines = [
-        "📋 *Новый ответ на опрос РКПЦ*",
+        "📋 *Результаты опроса РКПЦ*",
         f"🕐 {now}",
         f"👤 *ФИО:* {full_name}",
         f"💼 *Должность:* {position}",
         f"🏥 *Подразделение:* {department}",
+        f"📊 *Результат:* {correct_count} из {total} правильных",
         "",
     ]
     for q_id, answer in answers.items():
         question_text = questions.get(q_id, f"Вопрос {q_id}")
-        lines.append(f"*{question_text}*")
-        lines.append(f"➡️ {answer}")
+        correct_answer = correct.get(q_id, '')
+        is_correct = answer == correct_answer
+        mark = "✅" if is_correct else "❌"
+        lines.append(f"{mark} *{question_text}*")
+        lines.append(f"Ответ: {answer}")
+        if not is_correct:
+            lines.append(f"Правильно: {correct_answer}")
         lines.append("")
 
     message = "\n".join(lines)
