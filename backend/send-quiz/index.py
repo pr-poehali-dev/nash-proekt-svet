@@ -5,8 +5,20 @@ import urllib.parse
 from datetime import datetime
 
 
+def send_message(bot_token: str, chat_id: str, text: str):
+    url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
+    data = urllib.parse.urlencode({
+        'chat_id': chat_id,
+        'text': text,
+        'parse_mode': 'Markdown'
+    }).encode()
+    req = urllib.request.Request(url, data=data, method='POST')
+    with urllib.request.urlopen(req) as resp:
+        return json.loads(resp.read())
+
+
 def handler(event: dict, context) -> dict:
-    """Принимает ответы опроса РКПЦ и отправляет их в Telegram."""
+    """Принимает ответы экзамена РКПЦ и отправляет сводку в Telegram."""
 
     if event.get('httpMethod') == 'OPTIONS':
         return {
@@ -39,44 +51,45 @@ def handler(event: dict, context) -> dict:
     grade = body.get('grade', 'Не указано')
     exam_result = "✅ СДАН" if passed else "❌ НЕ СДАН"
 
-    lines = [
-        "🏥 *Экзамен по охране труда — РКПЦ*",
-        f"🕐 {now}",
-        f"👤 *ФИО:* {full_name}",
-        f"💼 *Должность:* {position}",
-        f"🏢 *Подразделение:* {department}",
-        "",
-        f"📊 *Результат:* {correct_count} из {total} баллов",
-        f"🎓 *Экзамен:* {exam_result}",
-        f"📝 *Оценка:* {grade}",
-        "",
+    wrong_answers = [
+        (q_id, questions.get(q_id, f"Вопрос {q_id}"), answers[q_id], correct.get(q_id, ''))
+        for q_id in answers
+        if answers[q_id] != correct.get(q_id, '')
     ]
-    for q_id, answer in answers.items():
-        question_text = questions.get(q_id, f"Вопрос {q_id}")
-        correct_answer = correct.get(q_id, '')
-        is_correct = answer == correct_answer
-        mark = "✅" if is_correct else "❌"
-        lines.append(f"{mark} *{question_text}*")
-        lines.append(f"Ответ: {answer}")
-        if not is_correct:
-            lines.append(f"Правильно: {correct_answer}")
-        lines.append("")
 
-    message = "\n".join(lines)
+    summary_lines = [
+        f"{'✅' if passed else '❌'} *{exam_result}*",
+        f"🏥 Экзамен по охране труда — РКПЦ",
+        f"🕐 {now}",
+        "",
+        f"👤 *{full_name}*",
+        f"💼 {position}",
+        f"🏢 {department}",
+        "",
+        f"📊 Результат: *{correct_count} из {total}* баллов",
+        f"📝 Оценка: *{grade}*",
+        f"❌ Ошибок: {len(wrong_answers)}",
+    ]
 
-    url = f"https://api.telegram.org/bot{bot_token}/sendMessage"
-    data = urllib.parse.urlencode({
-        'chat_id': chat_id,
-        'text': message,
-        'parse_mode': 'Markdown'
-    }).encode()
+    send_message(bot_token, chat_id, "\n".join(summary_lines))
 
-    req = urllib.request.Request(url, data=data, method='POST')
-    with urllib.request.urlopen(req) as resp:
-        result = json.loads(resp.read())
+    if wrong_answers:
+        error_lines = ["📋 *Допущенные ошибки:*", ""]
+        for q_id, q_text, user_ans, correct_ans in wrong_answers:
+            short_q = q_text[:80] + "..." if len(q_text) > 80 else q_text
+            error_lines.append(f"❌ {short_q}")
+            error_lines.append(f"   Ответ: {user_ans}")
+            error_lines.append(f"   Верно: {correct_ans}")
+            error_lines.append("")
+
+        errors_text = "\n".join(error_lines)
+        if len(errors_text) > 4000:
+            errors_text = errors_text[:4000] + "\n...(сокращено)"
+
+        send_message(bot_token, chat_id, errors_text)
 
     return {
         'statusCode': 200,
         'headers': {'Access-Control-Allow-Origin': '*'},
-        'body': json.dumps({'ok': True, 'telegram': result.get('ok')})
+        'body': json.dumps({'ok': True})
     }
