@@ -697,6 +697,14 @@ export default function Quiz() {
             </div>
 
 
+            <div className="px-8 py-6 border-t border-gray-200 text-center">
+              <button
+                onClick={restart}
+                className="bg-blue-900 text-white px-10 py-3 text-sm font-bold uppercase tracking-wide hover:bg-blue-800 transition-colors cursor-pointer"
+              >
+                Пройти заново
+              </button>
+            </div>
           </motion.div>
         )}
 
