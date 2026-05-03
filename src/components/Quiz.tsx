@@ -669,34 +669,6 @@ export default function Quiz() {
               <span>Проходной балл: <strong className="text-gray-900">{PASS_SCORE}</strong></span>
             </div>
 
-            <div className="px-8 py-6 flex flex-col gap-4">
-              <p className="text-xs font-bold text-gray-500 uppercase tracking-wide">Разбор ответов</p>
-              {questions.map((q) => {
-                const userAnswer = answers[q.id];
-                const isCorrect = userAnswer === q.correct;
-                return (
-                  <div
-                    key={q.id}
-                    className={`border-l-4 px-5 py-4 ${isCorrect ? "border-green-500 bg-green-50" : "border-red-500 bg-red-50"}`}
-                  >
-                    <p className={`text-xs font-bold uppercase tracking-wide mb-2 ${isCorrect ? "text-green-700" : "text-red-700"}`}>
-                      {isCorrect ? "✓ Верно" : "✗ Ошибка"} — Вопрос {q.id}
-                    </p>
-                    <p className="text-gray-800 text-sm font-semibold mb-3 leading-snug">{q.question}</p>
-                    <p className={`text-sm ${isCorrect ? "text-green-700" : "text-red-600"}`}>
-                      Ваш ответ: {userAnswer}
-                    </p>
-                    {!isCorrect && (
-                      <p className="text-green-700 text-sm mt-1 font-semibold">
-                        Правильный ответ: {q.correct}
-                      </p>
-                    )}
-                  </div>
-                );
-              })}
-            </div>
-
-
             <div className="px-8 py-6 border-t border-gray-200 text-center">
               <button
                 onClick={restart}
